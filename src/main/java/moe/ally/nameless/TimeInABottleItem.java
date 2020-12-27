@@ -27,7 +27,6 @@ public class TimeInABottleItem extends Item {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        PlayerEntity playerEntity = context.getPlayer();
         BlockPos pos = context.getBlockPos();
         World world = context.getWorld();
         BlockEntity tileEntity = world.getBlockEntity(pos);
@@ -56,6 +55,7 @@ public class TimeInABottleItem extends Item {
                         world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.BLOCKS, 0.5F, 0.793701F);
                         break;
                     case 3:
+                    case 6:
                         world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.BLOCKS, 0.5F, 0.890899F);
                         break;
                     case 4:
@@ -63,9 +63,6 @@ public class TimeInABottleItem extends Item {
                         break;
                     case 5:
                         world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.BLOCKS, 0.5F, 0.943874F);
-                        break;
-                    case 6:
-                        world.playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.BLOCKS, 0.5F, 0.890899F);
                         break;
                 }
                 return ActionResult.success(true);
