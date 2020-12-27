@@ -1,3 +1,4 @@
 {
-    "item.nameless.time_in_a_bottle": "Time In A Bottle"
+    "item.nameless.time_in_a_bottle": "Time In A Bottle",
+    "item.nameless.time_in_a_bottle.tooltip": "%d H | %d M | %d S"
 }

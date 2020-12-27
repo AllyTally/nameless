@@ -7,10 +7,12 @@ public class TimePos {
     public BlockPos pos;
     public World world;
     public int speed;
+    public int lifetime;
 
     public TimePos(BlockPos pos, World world, int speed) {
         this.pos = pos;
         this.world = world;
         this.speed = speed;
+        this.lifetime = 600;
     }
 }
