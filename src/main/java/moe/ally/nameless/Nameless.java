@@ -14,16 +14,18 @@ import net.minecraft.util.registry.Registry;
 import java.util.ArrayList;
 
 public class Nameless implements ModInitializer {
-	public static ArrayList<TimePos> TIABBlocks = new ArrayList<TimePos>();
+	public static ArrayList<TimePos> TIABBlocks = new ArrayList<>();
 	public static final TimeInABottleItem TIME_IN_A_BOTTLE = new TimeInABottleItem(new FabricItemSettings().group(ItemGroup.MISC).maxCount(1));
+	public static final SlimeslingItem SLIMESLING = new SlimeslingItem(new FabricItemSettings().group(ItemGroup.TOOLS).maxCount(1));
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, new Identifier("nameless", "time_in_a_bottle"), TIME_IN_A_BOTTLE);
+		Registry.register(Registry.ITEM, new Identifier("nameless", "slimesling"), SLIMESLING);
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			for (int i = TIABBlocks.size() - 1; i >= 0; i--) {
 				TimePos timePos = TIABBlocks.get(i);
 				BlockEntity tileEntity = timePos.world.getBlockEntity(timePos.pos);
-				if (tileEntity != null && tileEntity instanceof Tickable) {
+				if (tileEntity instanceof Tickable) {
 					Tickable tickable = (Tickable) tileEntity;
 					for (int j = 0; j < Math.pow(timePos.speed,2); j++) {
 						tickable.tick();
