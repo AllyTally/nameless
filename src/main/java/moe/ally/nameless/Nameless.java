@@ -1,45 +1,30 @@
 package moe.ally.nameless;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.block.entity.BlockEntity;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.registry.Registry;
 
-import java.util.ArrayList;
-
 public class Nameless implements ModInitializer {
-	public static ArrayList<TimePos> TIABBlocks = new ArrayList<>();
 	public static final TimeInABottleItem TIME_IN_A_BOTTLE = new TimeInABottleItem(new FabricItemSettings().group(ItemGroup.MISC).maxCount(1));
 	public static final SlimeslingItem SLIMESLING = new SlimeslingItem(new FabricItemSettings().group(ItemGroup.TOOLS).maxCount(1));
+	public static final EntityType<TickerEntity> TICKER = Registry.register(
+			Registry.ENTITY_TYPE,
+			new Identifier("nameless", "ticker"),
+			FabricEntityTypeBuilder.create(SpawnGroup.MISC, TickerEntity::new).dimensions(EntityDimensions.fixed(0.25F, 0.25F)).build()
+	);
+
+	public static final Identifier SPAWN_PACKET = new Identifier("nameless", "spawn/nonliving/generic");
+
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, new Identifier("nameless", "time_in_a_bottle"), TIME_IN_A_BOTTLE);
 		Registry.register(Registry.ITEM, new Identifier("nameless", "slimesling"), SLIMESLING);
-		ServerTickEvents.END_SERVER_TICK.register(server -> {
-			for (int i = TIABBlocks.size() - 1; i >= 0; i--) {
-				TimePos timePos = TIABBlocks.get(i);
-				BlockEntity tileEntity = timePos.world.getBlockEntity(timePos.pos);
-				if (tileEntity instanceof Tickable) {
-					Tickable tickable = (Tickable) tileEntity;
-					for (int j = 0; j < Math.pow(timePos.speed,2); j++) {
-						tickable.tick();
-					}
-					timePos.lifetime--;
-					if (timePos.lifetime <= 0) {
-						timePos.world.playSound(null, timePos.pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 1);
-						TIABBlocks.remove(i);
-					}
-				} else {
-					TIABBlocks.remove(i);
-					break;
-				}
-			}
-		});
 	}
 }
+

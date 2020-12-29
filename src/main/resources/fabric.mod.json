@@ -20,6 +20,9 @@
   "entrypoints": {
     "main": [
       "moe.ally.nameless.Nameless"
+    ],
+    "client": [
+      "moe.ally.nameless.NamelessClient"
     ]
   },
   "mixins": [
