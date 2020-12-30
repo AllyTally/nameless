@@ -41,7 +41,6 @@ public final class ClientNetworking {
         int velocityX = buf.readShort();
         int velocityY = buf.readShort();
         int velocityZ = buf.readShort();
-
         context.getTaskQueue().execute(() -> {
             ClientWorld world = (ClientWorld) context.getPlayer().getEntityWorld();
             Entity entity = entityType.create(world);
