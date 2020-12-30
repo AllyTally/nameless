@@ -23,7 +23,7 @@ import java.util.*;
 
 public class SlimeslingItem extends BowItem {
 
-    public static Hashtable slimeslingEntityVelocities = new Hashtable();
+    //public static Hashtable slimeslingEntityVelocities = new Hashtable();
 
     public SlimeslingItem(Settings settings) {
         super(settings);
@@ -41,8 +41,7 @@ public class SlimeslingItem extends BowItem {
         if (hit.getType() == Type.ENTITY && !(((EntityHitResult) hit).getEntity() instanceof LivingEntity)) return;
 
         // Get force
-        float pullProgress = getPullProgress(getMaxUseTime(stack) - remainingUseTicks);
-        float force = pullProgress;
+        float force = getPullProgress(getMaxUseTime(stack) - remainingUseTicks);
         force = (float) (Math.pow(force, 2) + (force * 2)) / 4f;
         force *= 4f;
         if (force > 6f) force = 6f;
@@ -59,9 +58,11 @@ public class SlimeslingItem extends BowItem {
         } else if (hit.getType() == Type.ENTITY && !world.isClient) {
             // Apply force
             LivingEntity mob = (LivingEntity) ((EntityHitResult) hit).getEntity();
-            Vec3d vec = ((PlayerEntity) user).getRotationVec(0).normalize();
+            Vec3d vec = user.getRotationVec(0).normalize();
+
+            // Set velocity
             mob.addVelocity(vec.x * force, vec.y * (force / 3), vec.z * force);
-            slimeslingEntityVelocities.put(mob, mob.getVelocity());
+            ((LivingEntityAccess) mob).setNextVelocity(mob.getVelocity());
         }
 
         // The good stuff

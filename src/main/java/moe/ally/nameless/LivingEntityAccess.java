@@ -1,8 +1,11 @@
 package moe.ally.nameless;
 
-public interface LivingEntityAccess {
-    public boolean alwaysDropXp = false;
+import net.minecraft.util.math.Vec3d;
 
-    public void setAlwaysDropXp(boolean value);
-    public boolean getAlwaysDropXp();
+public interface LivingEntityAccess {
+    void setAlwaysDropXp(boolean value);
+
+    void setNextVelocity(Vec3d next);
+
+    boolean bounce(float fallDistance);
 }

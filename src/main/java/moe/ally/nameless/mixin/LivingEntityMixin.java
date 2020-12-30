@@ -2,7 +2,6 @@ package moe.ally.nameless.mixin;
 
 import moe.ally.nameless.LivingEntityAccess;
 import moe.ally.nameless.Nameless;
-import moe.ally.nameless.SlimeslingItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -26,13 +25,23 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
     @Shadow
     public abstract ItemStack getEquippedStack(EquipmentSlot slot);
 
+    // General use
+    private boolean isPlayer() {
+        return (Object) this instanceof PlayerEntity;
+    }
+
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
 
-    // For slime boots
+    // For velocity updating (being launched by slimesling, bouncing with slime boots)
     private boolean updateVelocityOnce = false;
     private Vec3d nextUpdateVelocity;
+
+    public void setNextVelocity(Vec3d next) {
+        updateVelocityOnce = true;
+        nextUpdateVelocity = next;
+    }
 
     // For spikes
     private boolean alwaysDropXp = false;
@@ -40,35 +49,26 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
     public void setAlwaysDropXp(boolean value) {
         alwaysDropXp = value;
     }
-    public boolean getAlwaysDropXp() { return alwaysDropXp; }
 
     @Inject(at = @At("HEAD"), method = "shouldAlwaysDropXp", cancellable = true)
-    void dropXP(CallbackInfoReturnable<Boolean> cir){
+    void nameless_shouldAlwaysDropXp(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(alwaysDropXp);
     }
 
     @Inject(at = @At("HEAD"), method = "tick")
-    private void tick(CallbackInfo info) {
-        // Entity launched by player using slimesling
-        if (!((Object) this instanceof PlayerEntity)) {
-            LivingEntity self = (LivingEntity) ((Object) this);
-            if (SlimeslingItem.slimeslingEntityVelocities.containsKey(self)) {
-                setVelocity((Vec3d) SlimeslingItem.slimeslingEntityVelocities.get(self));
-                SlimeslingItem.slimeslingEntityVelocities.remove(self);
-            }
-        }
-
-        // Entity is wearing slime boots
+    private void nameless_tick(CallbackInfo info) {
         if (updateVelocityOnce) {
-            updateVelocityOnce = false;
-            setVelocity(nextUpdateVelocity);
+            if ((isPlayer() && this.world.isClient()) || (!isPlayer() && !this.world.isClient())) {
+                updateVelocityOnce = false;
+                setVelocity(nextUpdateVelocity);
+            }
         }
     }
 
-    @Inject(method = "handleFallDamage", at = @At("HEAD"), cancellable = true)
-    private void nameless_handleFallDamage(float fallDistance, float damageMultiplier, CallbackInfoReturnable<Boolean> info) {
-        if (this.getEquippedStack(EquipmentSlot.FEET).getItem() != Nameless.SLIME_BOOTS) return;
-        if (this.isSneaking() || fallDistance <= 2f || ((Object) this instanceof PlayerEntity && !this.world.isClient()) || (!((Object) this instanceof PlayerEntity) && this.world.isClient())) return;
+    // Slime boots bounce
+    public boolean bounce(float fallDistance) {
+        if (this.getEquippedStack(EquipmentSlot.FEET).getItem() != Nameless.SLIME_BOOTS) return false;
+        if (this.isSneaking() || fallDistance <= 2f || (isPlayer() && !this.world.isClient()) || (!isPlayer() && this.world.isClient())) return false;
 
         // Player movement
         Vec3d currentVelocity = this.getVelocity();
@@ -81,6 +81,11 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
         // Sound effect
         world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_SLIME_SQUISH, SoundCategory.PLAYERS, 1f, 1f, true);
 
-        info.setReturnValue(true);
+        return true;
+    }
+
+    @Inject(method = "handleFallDamage", at = @At("HEAD"), cancellable = true)
+    private void nameless_handleFallDamage(float fallDistance, float damageMultiplier, CallbackInfoReturnable<Boolean> info) {
+        info.setReturnValue(bounce(fallDistance));
     }
 }

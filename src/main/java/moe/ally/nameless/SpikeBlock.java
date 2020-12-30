@@ -1,10 +1,8 @@
 package moe.ally.nameless;
 
-import net.minecraft.block.AbstractBlock.Settings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -23,7 +21,8 @@ public class SpikeBlock extends Block {
         super(settings);
     }
 
-    public void onSteppedOn(World world, BlockPos pos, Entity entity) {
+    //public void onSteppedOn(World world, BlockPos pos, Entity entity) {
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
         if (entity instanceof LivingEntity) {
             ((LivingEntityAccess) entity).setAlwaysDropXp(true);
             entity.damage(DamageSource.GENERIC, 1.0F);
