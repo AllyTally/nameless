@@ -2,5 +2,9 @@
     "item.nameless.time_in_a_bottle": "Time In A Bottle",
     "item.nameless.time_in_a_bottle.tooltip": "%d H §7§o|§r %d M §7§o|§r %d S",
     "item.nameless.slimesling": "Slimesling",
-    "item.nameless.slimesling.tooltip": "§7§oIntended for use with Slime Boots"
+    "item.nameless.slimesling.tooltip1": "Charge and release to propel yourself (or mobs!) backwards",
+    "item.nameless.slimesling.tooltip2": "§7§oIntended for use with Slime Boots",
+    "item.nameless.slime_boots": "Slime Boots",
+    "item.nameless.slime_boots.tooltip1": "Makes you bounce instead of taking fall damage",
+    "item.nameless.slime_boots.tooltip2": "§7§oIntended for use with Slimesling"
 }

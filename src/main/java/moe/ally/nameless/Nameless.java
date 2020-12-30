@@ -5,7 +5,11 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorMaterial;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -13,6 +17,10 @@ import net.minecraft.util.registry.Registry;
 public class Nameless implements ModInitializer {
 	public static final TimeInABottleItem TIME_IN_A_BOTTLE = new TimeInABottleItem(new FabricItemSettings().group(ItemGroup.MISC).maxCount(1));
 	public static final SlimeslingItem SLIMESLING = new SlimeslingItem(new FabricItemSettings().group(ItemGroup.TOOLS).maxCount(1));
+
+	public static final ArmorMaterial slimeBootsMaterial = new SlimeBootsMaterial();
+	public static final Item SLIME_BOOTS = new SlimeBootsItem(slimeBootsMaterial, EquipmentSlot.FEET, new Item.Settings().group(ItemGroup.COMBAT));
+
 	public static final EntityType<TickerEntity> TICKER = Registry.register(
 			Registry.ENTITY_TYPE,
 			new Identifier("nameless", "ticker"),
@@ -25,6 +33,7 @@ public class Nameless implements ModInitializer {
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, new Identifier("nameless", "time_in_a_bottle"), TIME_IN_A_BOTTLE);
 		Registry.register(Registry.ITEM, new Identifier("nameless", "slimesling"), SLIMESLING);
+		Registry.register(Registry.ITEM, new Identifier("nameless", "slime_boots"), SLIME_BOOTS);
 	}
 }
 
