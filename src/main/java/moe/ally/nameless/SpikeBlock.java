@@ -25,10 +25,9 @@ public class SpikeBlock extends Block {
 
     public void onSteppedOn(World world, BlockPos pos, Entity entity) {
         if (entity instanceof LivingEntity) {
+            ((LivingEntityAccess) entity).setAlwaysDropXp(true);
             entity.damage(DamageSource.GENERIC, 1.0F);
-            if (((LivingEntity) entity).isDead()) {
-                System.out.println("asdf");
-            }
+            ((LivingEntityAccess) entity).setAlwaysDropXp(false);
         }
 
         super.onSteppedOn(world, pos, entity);

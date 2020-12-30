@@ -1,5 +1,6 @@
 package moe.ally.nameless.mixin;
 
+import moe.ally.nameless.LivingEntityAccess;
 import moe.ally.nameless.Nameless;
 import moe.ally.nameless.SlimeslingItem;
 import net.minecraft.entity.Entity;
@@ -20,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity {
+public abstract class LivingEntityMixin extends Entity implements LivingEntityAccess {
 
     @Shadow
     public abstract ItemStack getEquippedStack(EquipmentSlot slot);
@@ -32,6 +33,19 @@ public abstract class LivingEntityMixin extends Entity {
     // For slime boots
     private boolean updateVelocityOnce = false;
     private Vec3d nextUpdateVelocity;
+
+    // For spikes
+    private boolean alwaysDropXp = false;
+
+    public void setAlwaysDropXp(boolean value) {
+        alwaysDropXp = value;
+    }
+    public boolean getAlwaysDropXp() { return alwaysDropXp; }
+
+    @Inject(at = @At("HEAD"), method = "shouldAlwaysDropXp", cancellable = true)
+    void dropXP(CallbackInfoReturnable<Boolean> cir){
+        cir.setReturnValue(alwaysDropXp);
+    }
 
     @Inject(at = @At("HEAD"), method = "tick")
     private void tick(CallbackInfo info) {
