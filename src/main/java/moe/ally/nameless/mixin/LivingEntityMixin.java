@@ -2,12 +2,16 @@ package moe.ally.nameless.mixin;
 
 import moe.ally.nameless.LivingEntityAccess;
 import moe.ally.nameless.Nameless;
+import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.Packet;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
@@ -34,7 +38,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
         super(type, world);
     }
 
-    // For velocity updating (being launched by slimesling, bouncing with slime boots)
+    // For velocity updating (bouncing with slime boots)
     private boolean updateVelocityOnce = false;
     private Vec3d nextUpdateVelocity;
 
@@ -58,9 +62,11 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
     @Inject(at = @At("HEAD"), method = "tick")
     private void nameless_tick(CallbackInfo info) {
         if (updateVelocityOnce) {
-            if ((isPlayer() && this.world.isClient()) || (!isPlayer() && !this.world.isClient())) {
-                updateVelocityOnce = false;
+            boolean isClient = this.world.isClient();
+            boolean isPlayer = isPlayer();
+            if (isPlayer || (!isPlayer && !isClient)) {
                 setVelocity(nextUpdateVelocity);
+                updateVelocityOnce = false;
             }
         }
     }
@@ -75,8 +81,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
         this.setVelocity(currentVelocity.x / 0.95f, currentVelocity.y * -0.9, currentVelocity.z / 0.95f);
         this.setOnGround(false);
 
-        updateVelocityOnce = true;
-        nextUpdateVelocity = getVelocity();
+        setNextVelocity(getVelocity());
 
         // Sound effect
         world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_SLIME_SQUISH, SoundCategory.PLAYERS, 1f, 1f, true);

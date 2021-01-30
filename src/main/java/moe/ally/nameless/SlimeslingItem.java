@@ -1,11 +1,16 @@
 package moe.ally.nameless;
 
+import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.Packet;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
@@ -23,22 +28,27 @@ import java.util.*;
 
 public class SlimeslingItem extends BowItem {
 
-    //public static Hashtable slimeslingEntityVelocities = new Hashtable();
-
     public SlimeslingItem(Settings settings) {
         super(settings);
     }
 
     @Override
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        // Exit condition 1: not being used by a player, or player is not on ground
-        if (!(user instanceof PlayerEntity) || !user.isOnGround()) return;
+        // Exit condition 1: running on client, not being used by a player
+        if (world.isClient || !(user instanceof PlayerEntity) /*|| !user.isOnGround()*/) return;
 
-        // Exit condition 2: no block is targeted
         MinecraftClient client = MinecraftClient.getInstance();
+
+        // Exit condition 2: a non-living entity is targeted
+        Vec3d pos = user.getCameraPosVec(0.0F);
+        Vec3d ray = pos.add(user.getRotationVector().multiply(client.interactionManager.getReachDistance()));
+
+        EntityHitResult entityHitResult = net.minecraft.entity.projectile.ProjectileUtil.getEntityCollision(world, user, pos, ray, user.getBoundingBox().expand(client.interactionManager.getReachDistance()), entity -> true);
+        if (entityHitResult != null && !(entityHitResult.getEntity() instanceof LivingEntity)) return;
+
+        // Exit condition 3: no block or entity is targeted
         HitResult hit = client.crosshairTarget;
-        if (hit == null || hit.getType() == Type.MISS) return;
-        if (hit.getType() == Type.ENTITY && !(((EntityHitResult) hit).getEntity() instanceof LivingEntity)) return;
+        if (entityHitResult == null && (hit == null || hit.getType() == Type.MISS)) return;
 
         // Get force
         float force = getPullProgress(getMaxUseTime(stack) - remainingUseTicks);
@@ -47,27 +57,29 @@ public class SlimeslingItem extends BowItem {
         if (force > 6f) force = 6f;
 
         // For Players
-        if (hit.getType() == Type.BLOCK && world.isClient) {
+        if (hit.getType() == Type.BLOCK) {
             // Apply force
             PlayerEntity playerEntity = (PlayerEntity) user;
             Vec3d vec = playerEntity.getRotationVec(0).normalize();
             playerEntity.addVelocity(vec.x * -force, vec.y * (-force / 3), vec.z * -force);
-
-            playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
+            Packet packet = new EntityVelocityUpdateS2CPacket(playerEntity.getEntityId(), playerEntity.getVelocity());
+            PlayerStream.all(world.getServer()).forEach(serverPlayerEntity -> ServerSidePacketRegistry.INSTANCE.sendToPlayer(serverPlayerEntity, packet));
         // For Entities
-        } else if (hit.getType() == Type.ENTITY && !world.isClient) {
+        } else if (entityHitResult != null) {
             // Apply force
-            LivingEntity mob = (LivingEntity) ((EntityHitResult) hit).getEntity();
+            Entity mob = (LivingEntity) entityHitResult.getEntity();
             Vec3d vec = user.getRotationVec(0).normalize();
 
             // Set velocity
             mob.addVelocity(vec.x * force, vec.y * (force / 3), vec.z * force);
-            ((LivingEntityAccess) mob).setNextVelocity(mob.getVelocity());
+            System.out.println(mob.getVelocity());
+            Packet packet = new EntityVelocityUpdateS2CPacket(mob.getEntityId(), mob.getVelocity());
+            PlayerStream.all(world.getServer()).forEach(serverPlayerEntity -> ServerSidePacketRegistry.INSTANCE.sendToPlayer(serverPlayerEntity, packet));
         }
 
         // The good stuff
-        if (!world.isClient)
-            world.playSound(null, user.getBlockPos(), SoundEvents.ENTITY_SLIME_SQUISH, SoundCategory.PLAYERS, 1F, 1F);
+        world.playSound(null, user.getBlockPos(), SoundEvents.ENTITY_SLIME_SQUISH, SoundCategory.PLAYERS, 1F, 1F);
+        ((PlayerEntity)user).incrementStat(Stats.USED.getOrCreateStat(this));
     }
 
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
