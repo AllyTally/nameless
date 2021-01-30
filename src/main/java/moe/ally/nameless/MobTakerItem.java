@@ -57,23 +57,21 @@ public class MobTakerItem extends Item {
 
         BlockPos offset_pos = pos.offset(context.getSide());
         CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag compoundTag = (CompoundTag) tag.get("entity").copy();
         tag.remove("entity");
-        CompoundTag compoundTag = (CompoundTag) tag.get("entity");
         compoundTag.remove("Passengers");
         compoundTag.remove("Leash");
         compoundTag.remove("UUID");
-        //compoundTag.put("Pos", offset_pos.asLong());
-        //compoundTag.put("Motion", (0.0, 0.0, 0.0));
+        compoundTag.remove("Motion");
+        compoundTag.remove("OnGround");
 
 
-        //Entity entity = EntityType.loadEntityWithPassengers(compoundTag, world, (entityx) -> {
-        //    return entityx;
-        //};
+        Entity entity = EntityType.loadEntityWithPassengers(compoundTag, world, (entityx) -> {
+            return entityx;
+        });
 
-        /*
-*/
-        //world.spawnEntity(entity);
-        EntityType.getEntityFromTag(compoundTag, world);
+        entity.updatePosition(offset_pos.getX(),offset_pos.getY(),offset_pos.getZ());
+        world.spawnEntity(entity);
 
         world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 1.0F, 1.0F);
         return ActionResult.success(true);
