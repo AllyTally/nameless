@@ -2,16 +2,13 @@ package moe.ally.nameless.mixin;
 
 import moe.ally.nameless.LivingEntityAccess;
 import moe.ally.nameless.Nameless;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
-import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
@@ -28,6 +25,8 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
 
     @Shadow
     public abstract ItemStack getEquippedStack(EquipmentSlot slot);
+
+    @Shadow public abstract boolean damage(DamageSource source, float amount);
 
     // General use
     private boolean isPlayer() {
@@ -91,6 +90,9 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
 
     @Inject(method = "handleFallDamage", at = @At("HEAD"), cancellable = true)
     private void nameless_handleFallDamage(float fallDistance, float damageMultiplier, CallbackInfoReturnable<Boolean> info) {
-        info.setReturnValue(bounce(fallDistance));
+        if (bounce(fallDistance)) {
+            info.setReturnValue(true);
+            info.cancel();
+        }
     }
 }
