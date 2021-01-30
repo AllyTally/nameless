@@ -26,8 +26,7 @@ public abstract class PlayerEntityMixin extends Entity {
 
     @Inject(method = "handleFallDamage", at = @At("HEAD"), cancellable = true)
     private void nameless_handleFallDamage(float fallDistance, float damageMultiplier, CallbackInfoReturnable<Boolean> info) {
-        if (this.getEquippedStack(EquipmentSlot.FEET).getItem() == Nameless.SLIME_BOOTS) {
+        if (this.getEquippedStack(EquipmentSlot.FEET).getItem() == Nameless.SLIME_BOOTS)
             info.setReturnValue(((LivingEntityAccess) this).bounce(fallDistance));
-        }
     }
 }
