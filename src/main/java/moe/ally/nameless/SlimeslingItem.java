@@ -72,7 +72,6 @@ public class SlimeslingItem extends BowItem {
 
             // Set velocity
             mob.addVelocity(vec.x * force, vec.y * (force / 3), vec.z * force);
-            System.out.println(mob.getVelocity());
             Packet packet = new EntityVelocityUpdateS2CPacket(mob.getEntityId(), mob.getVelocity());
             PlayerStream.all(world.getServer()).forEach(serverPlayerEntity -> ServerSidePacketRegistry.INSTANCE.sendToPlayer(serverPlayerEntity, packet));
         }

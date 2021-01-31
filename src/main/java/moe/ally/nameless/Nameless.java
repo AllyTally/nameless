@@ -71,7 +71,6 @@ public class Nameless implements ModInitializer {
 						newStack = ((SoulJarItem)stack.getItem()).captureEntity(stack,null,(LivingEntity) entity);
 					} while(newStack == null);
 
-					//stack.decrement(1);
 					return newStack;
 				}
 				((SoulJarItem) stack.getItem()).spawnEntity(pos,direction,world,stack);

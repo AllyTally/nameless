@@ -20,9 +20,6 @@ public class NamelessClient implements ClientModInitializer {
 
         FabricModelPredicateProviderRegistry.register(new Identifier("nameless", "has_entity"), (stack, world, entity) ->
         {
-            if (entity == null) {
-                return 0;
-            }
             if (stack.getOrCreateTag().contains("entity")) {
                 return 1;
             }
