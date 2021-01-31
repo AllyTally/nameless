@@ -17,34 +17,25 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class MobTakerItem extends Item {
+public class SoulJarItem extends Item {
 
-    public MobTakerItem(Settings settings) {
+    public SoulJarItem(Settings settings) {
         super(settings);
     }
 
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        CompoundTag tag = stack.getOrCreateTag();
-        if (entity == null || stack == null || !entity.isAlive() || tag.contains("entity") || entity instanceof PlayerEntity) {
-            return ActionResult.FAIL;
+        ItemStack newStack = captureEntity(stack,user,entity);
+        if (newStack != null) {
+            user.setStackInHand(hand, newStack);
+            return ActionResult.success(user.world.isClient);
         }
-        if (!user.world.isClient) {
-            entity.stopRiding();
-            entity.removeAllPassengers();
-            CompoundTag entityData = new CompoundTag();
-            if (!entity.saveToTag(entityData)) return ActionResult.FAIL;
-
-            tag.put("entity", entityData);
-            entity.remove();
-
-            user.setStackInHand(hand, stack);
-        }
-        user.playSound(SoundEvents.ITEM_BOTTLE_FILL_DRAGONBREATH, 1.0F, 1.0F);
-        return ActionResult.success(user.world.isClient);
+        return ActionResult.FAIL;
     }
 
     public ActionResult useOnBlock(ItemUsageContext context) {
@@ -53,34 +44,69 @@ public class MobTakerItem extends Item {
         BlockEntity tileEntity = world.getBlockEntity(pos);
         ItemStack stack = context.getStack();
 
-        if (world.isClient) return ActionResult.PASS;
+        if (spawnEntity(pos,context.getSide(),world,stack)) {
+            return ActionResult.success(true);
+        }
+        return ActionResult.PASS;
 
-        BlockPos offset_pos = pos.offset(context.getSide());
+    }
+
+    public ItemStack captureEntity(ItemStack stack, @Nullable PlayerEntity user, LivingEntity entity) {
         CompoundTag tag = stack.getOrCreateTag();
+        if (entity == null || stack == null || !entity.isAlive() || tag.contains("entity") || entity instanceof PlayerEntity) {
+            return null;
+        }
+        if (user != null && user.world.isClient) return null;
+
+
+        entity.stopRiding();
+        entity.removeAllPassengers();
+        CompoundTag entityData = new CompoundTag();
+        if (!entity.saveToTag(entityData)) return null;
+
+        tag.put("entity", entityData);
+        tag.putString("entityName", entity.getDisplayName().getString());
+
+
+        entity.getEntityWorld().playSound(null, entity.getBlockPos(), SoundEvents.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        entity.remove();
+        return stack;
+    }
+
+
+    public boolean spawnEntity(BlockPos pos, Direction direction, World world, ItemStack stack) {
+        CompoundTag tag = stack.getOrCreateTag();
+        if (!tag.contains("entity")) return false;
+        if (world.isClient) return false;
+
+        BlockPos offset_pos = pos.offset(direction);
         CompoundTag compoundTag = (CompoundTag) tag.get("entity").copy();
         tag.remove("entity");
+        tag.remove("entityName");
         compoundTag.remove("Passengers");
         compoundTag.remove("Leash");
         compoundTag.remove("UUID");
         compoundTag.remove("Motion");
         compoundTag.remove("OnGround");
+        compoundTag.remove("FallDistance");
 
 
         Entity entity = EntityType.loadEntityWithPassengers(compoundTag, world, (entityx) -> {
             return entityx;
         });
 
-        entity.updatePosition(offset_pos.getX(),offset_pos.getY(),offset_pos.getZ());
+        entity.updatePosition(offset_pos.getX() + 0.5D,offset_pos.getY(),offset_pos.getZ() + 0.5D);
         world.spawnEntity(entity);
 
         world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_FILL_DRAGONBREATH, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        return ActionResult.success(true);
+        return true;
     }
 
     @Override
     public void appendTooltip(ItemStack itemStack, World world, List<Text> tooltip, TooltipContext tooltipContext) {
+        CompoundTag tag = itemStack.getOrCreateTag();
         if (itemStack.getOrCreateTag().contains("entity")) {
-            //tooltip.add("aaaaaaaaaaaaaaaaaaaaaaaaaa");
+            tooltip.add(new TranslatableText("item.nameless.soul_jar.tooltip", tag.getString("entityName")));
         }
     }
 

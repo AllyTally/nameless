@@ -7,5 +7,7 @@
     "item.nameless.slime_boots": "Slime Boots",
     "item.nameless.slime_boots.tooltip1": "Makes you bounce instead of taking fall damage",
     "item.nameless.slime_boots.tooltip2": "§7§oIntended for use with Slimesling",
+    "item.nameless.soul_jar": "Soul Jar",
+    "item.nameless.soul_jar.tooltip": "Current entity: §7%s",
     "block.nameless.spike_block": "Diamond Spike"
 }
