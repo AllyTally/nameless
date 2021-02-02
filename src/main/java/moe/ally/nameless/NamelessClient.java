@@ -25,6 +25,9 @@ public class NamelessClient implements ClientModInitializer {
             }
 
             return 0;
+		EntityRendererRegistry.INSTANCE.register(Nameless.GLASS_ITEM_FRAME_ENTITY, (dispatcher, context) -> {
+            return new GlassItemFrameEntityRenderer(dispatcher, context.getItemRenderer());
         });
+        ClientSidePacketRegistry.INSTANCE.register(Nameless.SPAWN_PACKET, ClientNetworking::spawnNonLivingEntity);
     }
 }

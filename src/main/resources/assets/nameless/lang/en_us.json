@@ -9,5 +9,7 @@
     "item.nameless.slime_boots.tooltip2": "§7§oIntended for use with Slimesling",
     "item.nameless.soul_jar": "Soul Jar",
     "item.nameless.soul_jar.tooltip": "§7Current entity: §r%s",
-    "block.nameless.spike_block": "Diamond Spike"
+    "block.nameless.spike_block": "Diamond Spike",
+    "item.nameless.glass_item_frame": "Glass Item Frame",
+    "entity.nameless.glass_item_frame": "Glass Item Frame"
 }

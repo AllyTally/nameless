@@ -11,6 +11,10 @@ import net.minecraft.block.dispenser.ItemDispenserBehavior;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.AbstractDonkeyEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPointer;
@@ -30,11 +34,18 @@ public class Nameless implements ModInitializer {
 	public static final SpikeBlock SPIKE_BLOCK = new SpikeBlock(Block.Settings.of(Material.STONE).strength(4.0f));
 	public static final ArmorMaterial slimeBootsMaterial = new SlimeBootsMaterial();
 	public static final Item SLIME_BOOTS = new SlimeBootsItem(slimeBootsMaterial, EquipmentSlot.FEET, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item GLASS_ITEM_FRAME = new GlassItemFrameItem(new FabricItemSettings().group(ItemGroup.DECORATIONS).maxCount(64));
 
 	public static final EntityType<TickerEntity> TICKER = Registry.register(
 			Registry.ENTITY_TYPE,
 			new Identifier("nameless", "ticker"),
 			FabricEntityTypeBuilder.create(SpawnGroup.MISC, TickerEntity::new).dimensions(EntityDimensions.fixed(0.25F, 0.25F)).build()
+	);
+
+	public static final EntityType<GlassItemFrameEntity> GLASS_ITEM_FRAME_ENTITY = Registry.register(
+			Registry.ENTITY_TYPE,
+			new Identifier("nameless", "glass_item_frame"),
+			FabricEntityTypeBuilder.create(SpawnGroup.MISC, GlassItemFrameEntity::new).dimensions(EntityDimensions.fixed(1F, 1F)).build()
 	);
 
 	public static final Identifier SPAWN_PACKET = new Identifier("nameless", "spawn/nonliving/generic");
@@ -78,7 +89,7 @@ public class Nameless implements ModInitializer {
 			}
 		});
 
-
+		Registry.register(Registry.ITEM, new Identifier("nameless", "glass_item_frame"), GLASS_ITEM_FRAME);
 	}
 }
 
