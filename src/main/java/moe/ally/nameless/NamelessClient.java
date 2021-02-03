@@ -19,15 +19,15 @@ public class NamelessClient implements ClientModInitializer {
         ClientSidePacketRegistry.INSTANCE.register(Nameless.SPAWN_PACKET, ClientNetworking::spawnNonLivingEntity);
 
         FabricModelPredicateProviderRegistry.register(new Identifier("nameless", "has_entity"), (stack, world, entity) ->
-        {
-            if (stack.getOrCreateTag().contains("entity")) {
-                return 1;
-            }
+            {
+                if (stack.getOrCreateTag().contains("entity")) {
+                    return 1;
+                }
 
-            return 0;
+                return 0;
+            });
 		EntityRendererRegistry.INSTANCE.register(Nameless.GLASS_ITEM_FRAME_ENTITY, (dispatcher, context) -> {
             return new GlassItemFrameEntityRenderer(dispatcher, context.getItemRenderer());
         });
-        ClientSidePacketRegistry.INSTANCE.register(Nameless.SPAWN_PACKET, ClientNetworking::spawnNonLivingEntity);
     }
 }
