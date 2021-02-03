@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "GIG",
+    "GGG"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    "I": {
+      "item": "minecraft:item_frame"
+    }
+  },
+  "result": {
+    "item": "nameless:glass_item_frame",
+    "count": 1
+  }
+}
