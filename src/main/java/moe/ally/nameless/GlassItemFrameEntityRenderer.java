@@ -45,7 +45,7 @@ public class GlassItemFrameEntityRenderer extends ItemFrameEntityRenderer {
 
         ItemStack itemStack = itemFrameEntity.getHeldItemStack();
 
-        if (itemStack.isEmpty() || itemStack.getItem() == Items.FILLED_MAP) {
+        if (itemStack.isEmpty()) {
             matrixStack.push();
             this.model.render(matrixStack, vertexConsumerProvider.getBuffer(this.model.getLayer(this.getTexture(itemFrameEntity))), i, OverlayTexture.DEFAULT_UV, 1.0F, 1.0F, 1.0F, 1.0F);
             matrixStack.pop();

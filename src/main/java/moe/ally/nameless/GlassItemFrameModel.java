@@ -14,7 +14,6 @@ public class GlassItemFrameModel extends EntityModel<GlassItemFrameEntity> {
 
         model = new ModelPart(this, 6, 4);
 
-        //model.addCuboid(-5, -5, 5.5f, 10, 10, 2);
         model.addCuboid(-6, -6, 7, 1, 12, 1);
         model.addCuboid(5, -6, 7, 1, 12, 1);
         model.addCuboid(-5, 5, 7, 10, 1, 1);
