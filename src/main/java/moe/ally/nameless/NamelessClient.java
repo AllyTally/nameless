@@ -16,7 +16,6 @@ public class NamelessClient implements ClientModInitializer {
         EntityRendererRegistry.INSTANCE.register(Nameless.TICKER, (dispatcher, context) -> {
             return new TickerEntityRenderer(dispatcher);
         });
-        ClientSidePacketRegistry.INSTANCE.register(Nameless.SPAWN_PACKET, ClientNetworking::spawnNonLivingEntity);
 
         FabricModelPredicateProviderRegistry.register(new Identifier("nameless", "has_entity"), (stack, world, entity) ->
             {

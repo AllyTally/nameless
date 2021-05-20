@@ -2,6 +2,7 @@ package moe.ally.nameless.mixin;
 
 import moe.ally.nameless.GlassItemFrameEntity;
 import moe.ally.nameless.Nameless;
+import moe.ally.nameless.TickerEntity;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -30,21 +31,35 @@ public class ClientPlayNetworkHandlerMixin {
     ) // thank you parzivail
     private void onEntitySpawn(EntitySpawnS2CPacket packet, CallbackInfo ci, double x, double y, double z, EntityType<?> type) {
         Entity entity = null;
-        if (type == Nameless.GLASS_ITEM_FRAME_ENTITY)
+        if (type == Nameless.GLASS_ITEM_FRAME_ENTITY) {
             entity = GlassItemFrameEntity.summon(world, new BlockPos(new Vec3d(x, y, z)), Direction.byId(packet.getEntityData()));
 
-        if (entity != null) {
-            int entityId = packet.getId();
-            ((GlassItemFrameEntity)entity).setFacing(((GlassItemFrameEntity)entity).getHorizontalFacing());
-            entity.setVelocity(Vec3d.ZERO);
-            entity.updatePosition(x, y, z);
-            entity.updateTrackedPosition(x, y, z);
-            entity.pitch = (float) (packet.getPitch() * 360) / 256f;
-            entity.yaw = (float) (packet.getYaw() * 360) / 256f;
-            entity.setEntityId(entityId);
-            entity.setUuid(packet.getUuid());
-            this.world.addEntity(entityId, entity);
-            ci.cancel();
+            if (entity != null) {
+                int entityId = packet.getId();
+                ((GlassItemFrameEntity) entity).setFacing(((GlassItemFrameEntity) entity).getHorizontalFacing());
+                entity.setVelocity(Vec3d.ZERO);
+                entity.updatePosition(x, y, z);
+                entity.updateTrackedPosition(x, y, z);
+                entity.pitch = (float) (packet.getPitch() * 360) / 256f;
+                entity.yaw = (float) (packet.getYaw() * 360) / 256f;
+                entity.setEntityId(entityId);
+                entity.setUuid(packet.getUuid());
+                this.world.addEntity(entityId, entity);
+                ci.cancel();
+            }
+        } else if (type == Nameless.TICKER) {
+            entity = TickerEntity.summon(world, new BlockPos(new Vec3d(x, y, z)), Direction.byId(packet.getEntityData()));
+
+            if (entity != null) {
+                int entityId = packet.getId();
+                entity.setVelocity(Vec3d.ZERO);
+                entity.updatePosition(x, y, z);
+                entity.updateTrackedPosition(x, y, z);
+                entity.setEntityId(entityId);
+                entity.setUuid(packet.getUuid());
+                this.world.addEntity(entityId, entity);
+                ci.cancel();
+            }
         }
     }
 }

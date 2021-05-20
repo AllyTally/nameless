@@ -11,11 +11,13 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -28,6 +30,9 @@ public class TickerEntity extends Entity {
         super(type, world);
     }
 
+    public static TickerEntity summon(World world, BlockPos pos, Direction direction) {
+        return new TickerEntity(Nameless.TICKER, world);
+    }
 
     @Override
     public void tick() {
@@ -88,7 +93,7 @@ public class TickerEntity extends Entity {
         tag.putInt("Speed", getSpeed());
     }
 
-    @Override
+    /*@Override
     public Packet<?> createSpawnPacket() {
         final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeVarInt(getEntityId());
@@ -104,5 +109,8 @@ public class TickerEntity extends Entity {
         buf.writeShort((int) (MathHelper.clamp(getVelocity().getZ(), -3.9D, 3.9D) * 8000.0D));
 
         return ServerSidePacketRegistry.INSTANCE.toPacket(Nameless.SPAWN_PACKET, buf);
+    }*/
+    public Packet<?> createSpawnPacket() {
+        return new EntitySpawnS2CPacket(this, getEntityId());
     }
 }
