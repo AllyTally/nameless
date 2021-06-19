@@ -30,7 +30,7 @@ import net.minecraft.util.math.Vec3f;
 public class GlassItemFrameEntityRenderer extends ItemFrameEntityRenderer {
     private static final Identifier ID = new Identifier("nameless", "textures/block/glass_item_frame.png");
     //private final GlassItemFrameModel model = new GlassItemFrameModel();
-    private static final ModelIdentifier NORMAL_FRAME = new ModelIdentifier("glass_item_frame", "");
+    private static final ModelIdentifier NORMAL_FRAME = new ModelIdentifier("nameless:glass_item_frame");
 
     private final MinecraftClient client = MinecraftClient.getInstance();
     private final ItemRenderer itemRenderer;

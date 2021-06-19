@@ -1,9 +1,9 @@
-# Fabric Example Mod
+# Nyabric Example Meowd
 
 ## Setup
 
-For setup instructions please see the [fabric wiki page](https://fabricmc.net/wiki/tutorial:setup) that relates to the IDE that you are using.
+Fur setup instructions please see the [nyabric wiki pawge](https://fabricmc.net/wiki/tutorial:setup) that relates to the CPE (cat petting environment) that you are using.
 
 ## License
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+This template is nyavailable under the CC0 license. Feel free to learnmeow from it and incorpawrate it in your own nyaprojects.

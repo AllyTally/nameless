@@ -3,10 +3,12 @@ package moe.ally.nameless;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
@@ -25,5 +27,8 @@ public class NamelessClient implements ClientModInitializer {
                 return 0;
             });
 		EntityRendererRegistry.INSTANCE.register(Nameless.GLASS_ITEM_FRAME_ENTITY, GlassItemFrameEntityRenderer::new);
+        ModelLoadingRegistry.INSTANCE.registerAppender(
+                (resourceManager, out) -> out.accept(new ModelIdentifier("nameless:glass_item_frame"))
+        );
     }
 }
