@@ -29,7 +29,7 @@ public class SpikeBlock extends Block {
             ((LivingEntityAccess) entity).setAlwaysDropXp(false);
         }
 
-        super.onSteppedOn(world, pos, entity);
+        super.onEntityCollision(state, world, pos, entity);
     }
 
     @Override

@@ -29,7 +29,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
     @Shadow public abstract boolean damage(DamageSource source, float amount);
 
     // General use
-    private boolean isPlayer() {
+    public boolean isPlayer() {
         return (Object) this instanceof PlayerEntity;
     }
 
@@ -89,7 +89,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAc
     }
 
     @Inject(method = "handleFallDamage", at = @At("HEAD"), cancellable = true)
-    private void nameless_handleFallDamage(float fallDistance, float damageMultiplier, CallbackInfoReturnable<Boolean> info) {
+    private void nameless_handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource, CallbackInfoReturnable<Boolean> info) {
         if (bounce(fallDistance)) {
             info.setReturnValue(true);
             info.cancel();

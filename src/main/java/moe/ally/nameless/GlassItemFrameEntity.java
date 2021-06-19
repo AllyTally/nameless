@@ -38,15 +38,15 @@ public class GlassItemFrameEntity extends ItemFrameEntity {
         Validate.notNull(facing);
         this.facing = facing;
         if (facing.getAxis().isHorizontal()) {
-            this.pitch = 0.0F;
-            this.yaw = (float)(this.facing.getHorizontal() * 90);
+            this.setPitch(0.0F);
+            this.setYaw((float)(this.facing.getHorizontal() * 90));
         } else {
-            this.pitch = (float)(-90 * facing.getDirection().offset());
-            this.yaw = 0.0F;
+            this.setPitch((float)(-90 * facing.getDirection().offset()));
+            this.setYaw(0.0F);
         }
 
-        this.prevPitch = this.pitch;
-        this.prevYaw = this.yaw;
+        this.prevPitch = this.getPitch();
+        this.prevYaw = this.getYaw();
         this.updateAttachmentPosition();
     }
 
@@ -96,7 +96,7 @@ public class GlassItemFrameEntity extends ItemFrameEntity {
             } else {
                 if (entity instanceof PlayerEntity) {
                     PlayerEntity playerEntity = (PlayerEntity)entity;
-                    if (playerEntity.abilities.creativeMode) {
+                    if (playerEntity.getAbilities().creativeMode) {
                         this.removeFromFrame(itemStack);
                         return;
                     }
@@ -121,7 +121,7 @@ public class GlassItemFrameEntity extends ItemFrameEntity {
     private void removeFromFrame(ItemStack map) {
         if (map.getItem() == Items.FILLED_MAP) {
             MapState mapState = FilledMapItem.getOrCreateMapState(map, this.world);
-            mapState.removeFrame(this.attachmentPos, this.getEntityId());
+            mapState.removeFrame(this.attachmentPos, this.getId());
             mapState.setDirty(true);
         }
 

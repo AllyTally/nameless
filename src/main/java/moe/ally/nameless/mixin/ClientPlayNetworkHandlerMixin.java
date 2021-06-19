@@ -24,13 +24,16 @@ public class ClientPlayNetworkHandlerMixin {
     private ClientWorld world;
 
     @Inject(
-            method = "onEntitySpawn(Lnet/minecraft/network/packet/s2c/play/EntitySpawnS2CPacket;)V",
+            method = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;onEntitySpawn(Lnet/minecraft/network/packet/s2c/play/EntitySpawnS2CPacket;)V",
             at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/network/packet/s2c/play/EntitySpawnS2CPacket;getEntityTypeId()Lnet/minecraft/entity/EntityType;"),
             cancellable = true,
             locals = LocalCapture.CAPTURE_FAILHARD
     ) // thank you parzivail
-    private void onEntitySpawn(EntitySpawnS2CPacket packet, CallbackInfo ci, double x, double y, double z, EntityType<?> type) {
+    private void onEntitySpawn(EntitySpawnS2CPacket packet, CallbackInfo ci, EntityType<?> type) {
         Entity entity = null;
+        Double x = packet.getX();
+        Double y = packet.getY();
+        Double z = packet.getZ();
         if (type == Nameless.GLASS_ITEM_FRAME_ENTITY) {
             entity = GlassItemFrameEntity.summon(world, new BlockPos(new Vec3d(x, y, z)), Direction.byId(packet.getEntityData()));
 
@@ -38,11 +41,11 @@ public class ClientPlayNetworkHandlerMixin {
                 int entityId = packet.getId();
                 ((GlassItemFrameEntity) entity).setFacing(((GlassItemFrameEntity) entity).getHorizontalFacing());
                 entity.setVelocity(Vec3d.ZERO);
-                entity.updatePosition(x, y, z);
+                entity.setPosition(x, y, z);
                 entity.updateTrackedPosition(x, y, z);
-                entity.pitch = (float) (packet.getPitch() * 360) / 256f;
-                entity.yaw = (float) (packet.getYaw() * 360) / 256f;
-                entity.setEntityId(entityId);
+                entity.setPitch((float) (packet.getPitch() * 360) / 256f);
+                entity.setYaw((float) (packet.getYaw() * 360) / 256f);
+                entity.setId(entityId);
                 entity.setUuid(packet.getUuid());
                 this.world.addEntity(entityId, entity);
                 ci.cancel();
@@ -53,9 +56,9 @@ public class ClientPlayNetworkHandlerMixin {
             if (entity != null) {
                 int entityId = packet.getId();
                 entity.setVelocity(Vec3d.ZERO);
-                entity.updatePosition(x, y, z);
+                entity.setPosition(x, y, z);
                 entity.updateTrackedPosition(x, y, z);
-                entity.setEntityId(entityId);
+                entity.setId(entityId);
                 entity.setUuid(packet.getUuid());
                 this.world.addEntity(entityId, entity);
                 ci.cancel();

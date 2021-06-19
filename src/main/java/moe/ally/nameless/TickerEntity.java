@@ -2,20 +2,24 @@ package moe.ally.nameless;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -39,17 +43,28 @@ public class TickerEntity extends Entity {
         super.tick();
 
         BlockPos currentBlockPos = new BlockPos(getX(), getY(), getZ());
-        BlockEntity blockEntity = getEntityWorld().getBlockEntity(currentBlockPos);
 
         if(!world.isClient()) {
-            if (!(blockEntity instanceof Tickable)) {
+            BlockEntity blockEntity = getEntityWorld().getBlockEntity(currentBlockPos);
+            if (blockEntity == null) {
+                // This... isn't even a block entity?
+                destroyTicker();
+                return;
+            }
+            Block block = blockEntity.getCachedState().getBlock();
+            BlockEntityProvider blockEntityProvider = (BlockEntityProvider) block;
+
+            if (blockEntityProvider.getTicker(blockEntity.getWorld(),blockEntity.getCachedState(),blockEntity.getType()) == null) {
                 // This isn't a tickable block!!
                 destroyTicker();
                 return;
             }
 
             for(int i = 0; i < Math.pow(getSpeed(),2); i++) {
-                ((Tickable) blockEntity).tick();
+                //blockEntityProvider.getTicker(blockEntity.getWorld(),blockEntity.getCachedState(),blockEntity.getType()).tick(blockEntity.getWorld(),blockEntity.getPos(),blockEntity.getCachedState(),null);
+
+                BlockEntityTicker ticker = blockEntityProvider.getTicker(blockEntity.getWorld(),blockEntity.getCachedState(),blockEntity.getType());
+                ticker.tick(blockEntity.getWorld(),blockEntity.getPos(),blockEntity.getCachedState(), blockEntity);
             }
 
             if (age >= 600) {
@@ -82,14 +97,14 @@ public class TickerEntity extends Entity {
     }
 
     @Override
-    protected void readCustomDataFromTag(CompoundTag tag) {
+    protected void readCustomDataFromNbt(NbtCompound tag) {
         if (tag.contains("Speed")) {
             setSpeed(tag.getInt("Speed"));
         }
     }
 
     @Override
-    protected void writeCustomDataToTag(CompoundTag tag) {
+    protected void writeCustomDataToNbt(NbtCompound tag) {
         tag.putInt("Speed", getSpeed());
     }
 
@@ -111,6 +126,6 @@ public class TickerEntity extends Entity {
         return ServerSidePacketRegistry.INSTANCE.toPacket(Nameless.SPAWN_PACKET, buf);
     }*/
     public Packet<?> createSpawnPacket() {
-        return new EntitySpawnS2CPacket(this, getEntityId());
+        return new EntitySpawnS2CPacket(this, getId());
     }
 }

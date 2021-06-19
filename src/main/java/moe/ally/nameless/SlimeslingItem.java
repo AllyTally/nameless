@@ -61,7 +61,7 @@ public class SlimeslingItem extends BowItem {
 
             // Set velocity
             mob.addVelocity(vec.x * force, vec.y * (force / 3), vec.z * force);
-            Packet packet = new EntityVelocityUpdateS2CPacket(mob.getEntityId(), mob.getVelocity());
+            Packet packet = new EntityVelocityUpdateS2CPacket(mob.getId(), mob.getVelocity());
             PlayerStream.all(world.getServer()).forEach(serverPlayerEntity -> ServerSidePacketRegistry.INSTANCE.sendToPlayer(serverPlayerEntity, packet));
         // For Players
         } else {
@@ -73,7 +73,7 @@ public class SlimeslingItem extends BowItem {
                 PlayerEntity playerEntity = (PlayerEntity) user;
                 Vec3d vec = playerEntity.getRotationVec(0).normalize();
                 playerEntity.addVelocity(vec.x * -force, vec.y * (-force / 3), vec.z * -force);
-                Packet packet = new EntityVelocityUpdateS2CPacket(playerEntity.getEntityId(), playerEntity.getVelocity());
+                Packet packet = new EntityVelocityUpdateS2CPacket(playerEntity.getId(), playerEntity.getVelocity());
                 PlayerStream.all(world.getServer()).forEach(serverPlayerEntity -> ServerSidePacketRegistry.INSTANCE.sendToPlayer(serverPlayerEntity, packet));
             } else
                 return;

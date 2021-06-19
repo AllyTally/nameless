@@ -1,6 +1,10 @@
 package moe.ally.nameless;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SpawnReason;
@@ -8,14 +12,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
@@ -33,15 +36,19 @@ public class TimeInABottleItem extends Item {
     public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos pos = context.getBlockPos();
         World world = context.getWorld();
-        BlockEntity tileEntity = world.getBlockEntity(pos);
+        BlockEntity blockEntity = world.getBlockEntity(pos);
         ItemStack stack = context.getStack();
 
         if (world.isClient) return ActionResult.PASS;
 
-        if (tileEntity == null) return ActionResult.PASS;
-        if (!(tileEntity instanceof Tickable)) return ActionResult.PASS;
+        if (blockEntity == null) return ActionResult.PASS;
 
-        CompoundTag tag = stack.getOrCreateTag();
+        Block block = blockEntity.getCachedState().getBlock();
+        BlockEntityProvider blockEntityProvider = (BlockEntityProvider) block;
+            
+        if (blockEntityProvider.getTicker(blockEntity.getWorld(),blockEntity.getCachedState(),blockEntity.getType()) == null) return ActionResult.PASS;
+
+        NbtCompound tag = stack.getOrCreateTag();
         int timeStored = tag.getInt("timeStored");
 
         Optional<TickerEntity> tickersInBlock = world.getNonSpectatingEntities(TickerEntity.class, new Box(pos).shrink(0.2, 0.2, 0.2)).stream().findFirst();
@@ -91,7 +98,7 @@ public class TimeInABottleItem extends Item {
         if (!(entity instanceof PlayerEntity)) return;
 
         if (world.getTime() % 20 == 0) {
-            CompoundTag tag = stack.getOrCreateTag();
+            NbtCompound tag = stack.getOrCreateTag();
             if (tag.getInt("timeStored") < 622080000) {
                 tag.putInt("timeStored", tag.getInt("timeStored") + 20);
             }
@@ -100,7 +107,7 @@ public class TimeInABottleItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack itemStack, World world, List<Text> tooltip, TooltipContext tooltipContext) {
-        CompoundTag tag = itemStack.getOrCreateTag();
+        NbtCompound tag = itemStack.getOrCreateTag();
         int storedSeconds = tag.getInt("timeStored") / 20;
 
         int hours = storedSeconds / 3600;

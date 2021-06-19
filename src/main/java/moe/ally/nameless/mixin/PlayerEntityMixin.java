@@ -5,6 +5,7 @@ import moe.ally.nameless.Nameless;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -25,7 +26,7 @@ public abstract class PlayerEntityMixin extends Entity {
     }
 
     @Inject(method = "handleFallDamage", at = @At("HEAD"), cancellable = true)
-    private void nameless_handleFallDamage(float fallDistance, float damageMultiplier, CallbackInfoReturnable<Boolean> info) {
+    private void nameless_handleFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource, CallbackInfoReturnable<Boolean> info) {
         if (this.getEquippedStack(EquipmentSlot.FEET).getItem() == Nameless.SLIME_BOOTS)
             info.setReturnValue(((LivingEntityAccess) this).bounce(fallDistance));
     }

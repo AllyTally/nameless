@@ -5,17 +5,21 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3f;
 
 public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
-    public TickerEntityRenderer(EntityRenderDispatcher dispatcher) {
-        super(dispatcher);
+    private final ItemRenderer itemRenderer;
+    public TickerEntityRenderer(EntityRendererFactory.Context context) {
+        super(context);
+        this.itemRenderer = context.getItemRenderer();
     }
     @Override
     public Identifier getTexture(TickerEntity entity) {
@@ -32,9 +36,11 @@ public class TickerEntityRenderer extends EntityRenderer<TickerEntity> {
             matrices.translate(direction.getOffsetX()/1.95f, (direction.getOffsetY()/1.95f + 0.5), direction.getOffsetZ()/1.95f);
 
             // align to block sides
-            matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(direction.asRotation()));
+            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(direction.asRotation()));
 
-            MinecraftClient.getInstance().getItemRenderer().renderItem(tiabStack, ModelTransformation.Mode.GROUND, 242, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
+            //MinecraftClient.getInstance().getItemRenderer().renderItem(tiabStack, ModelTransformation.Mode.GROUND, 242, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers);
+            this.itemRenderer.renderItem(tiabStack, ModelTransformation.Mode.GROUND, 242, OverlayTexture.DEFAULT_UV, matrices, vertexConsumers,entity.getId());
+            //this.itemRenderer.renderItem(itemStack, ModelTransformation.Mode.FIXED, i, OverlayTexture.DEFAULT_UV, matrixStack, vertexConsumerProvider, itemFrameEntity.getId());
             matrices.pop();
         }
     }
